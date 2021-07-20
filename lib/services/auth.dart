@@ -39,7 +39,7 @@ class AuthService {
 
   //update the User's data in Firestore on each new login
   Future<void> updateUserData(User? user) {
-    DocumentReference userRef = _db.collection('User').doc(user!.uid);
+    DocumentReference userRef = _db.collection('user').doc(user!.uid);
     return userRef.set({'userName': user.displayName, 'userEmail': user.email});
   }
 

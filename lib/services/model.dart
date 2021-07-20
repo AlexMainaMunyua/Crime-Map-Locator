@@ -1,10 +1,10 @@
-class User {
+class UserInfo {
   String? userName;
   String? userEmail;
 
-  User({this.userEmail, this.userName});
+  UserInfo({this.userEmail, this.userName});
 
-  User.fromMap(Map data) {
+  UserInfo.fromMap(Map data) {
     userName = data['userName'];
     userEmail = data['UserEmail'];
   }

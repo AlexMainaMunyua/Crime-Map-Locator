@@ -28,6 +28,10 @@ An application that will allow users to view and add areas reported with crimes 
 ## Technologies Used.
 
 ## App Permission
+- Access to Storage
+- Access to camera
+- Internet access
+- Access to location
 
 ## Connect with me
 

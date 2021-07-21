@@ -23,3 +23,16 @@ An application that will allow users to view and add areas reported with crimes 
 - If file upload is not an image, display an error.
 - **Testing is not required but it is highly recommended**.
 
+## Installation.
+
+## Technologies Used.
+
+## App Permission
+
+## Connect with me
+
+[<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn]
+[<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter]
+
+[linkedIn]: https://www.linkedin.com/in/alex-maina/
+[twitter]: https://twitter.com/RonaldoMaina

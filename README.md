@@ -1,7 +1,7 @@
-# crime_map
+## crime_map
 
 An application that will allow users to view and add areas reported with crimes to a crime map.
-## Roadmap/TODOs
+### Roadmap/TODOs
 - The application has two screens.
     - A map that displays all the reported crime-prone areas
     - A screen that will allow a user to add a place to a crime map.
@@ -23,17 +23,17 @@ An application that will allow users to view and add areas reported with crimes 
 - If file upload is not an image, display an error.
 - **Testing is not required but it is highly recommended**.
 
-## Installation.
+### Installation.
 
-## Technologies Used.
+### Technologies Used.
 
-## App Permission
+### App Permission
 - Access to Storage
 - Access to camera
 - Internet access
 - Access to location
 
-## Connect with me
+### Connect with me
 
 [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn]
 [<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter]

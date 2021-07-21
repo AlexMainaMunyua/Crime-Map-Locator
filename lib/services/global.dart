@@ -1,5 +1,4 @@
 import 'package:crime_map/services/service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Static global state. Immutabel services that do not care about build context.
 class Global {
@@ -18,5 +17,4 @@ class Global {
 
   static final Collection<CrimeLocation> crimeLocation =
       Collection<CrimeLocation>(path: 'crimeLocation');
-
 }

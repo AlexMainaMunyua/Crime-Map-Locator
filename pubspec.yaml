@@ -18,6 +18,8 @@ dependencies:
   firebase_auth: ^3.0.1
   rxdart: ^0.27.1
   flutter_riverpod: ^0.14.0+3
+  font_awesome_flutter: ^9.1.0
+  provider: ^6.0.0-dev
 
 dev_dependencies:
   flutter_test:

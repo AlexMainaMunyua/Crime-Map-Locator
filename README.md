@@ -1,9 +1,6 @@
 # crime_map
 
 An application that will allow users to view and add areas reported with crimes to a crime map.
-
-## Getting Started
-
 ## Roadmap/TODOs
 - The application has two screens.
     - A map that displays all the reported crime-prone areas
@@ -26,4 +23,3 @@ An application that will allow users to view and add areas reported with crimes 
 - If file upload is not an image, display an error.
 - **Testing is not required but it is highly recommended**.
 
-# crime_map

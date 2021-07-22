@@ -23,6 +23,7 @@ dependencies:
   google_maps_flutter: ^2.0.6
   http: ^0.13.3
   json_serializable: ^4.1.0
+  location: ^4.3.0
 
 dev_dependencies:
   flutter_test:
@@ -31,5 +32,6 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
+    - assets/map_style.txt
 
   uses-material-design: true

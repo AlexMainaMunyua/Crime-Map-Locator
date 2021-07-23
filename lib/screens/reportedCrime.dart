@@ -1,4 +1,6 @@
-import 'package:crime_map/screens/screens.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:crime_map/shared_widgets/shared_widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -13,50 +15,21 @@ class ReportedCrime extends StatefulWidget {
 
 class _ReportedCrimeState extends State<ReportedCrime>
     with SingleTickerProviderStateMixin {
-  // Location _location = Location();
-  // String? _mapStyle;
-
-  // LatLng _currentMapPosition;
-
-  // void _onAddMarkerButtonPressed() {
-  //   setState(() {
-  //     _markers.add(Marker(
-  //       markerId: MarkerId(_currentMapPosition.toString()),
-  //       position: _currentMapPosition,
-  //       infoWindow:
-  //           InfoWindow(title: 'Nice Place', snippet: 'Welcome to Poland'),
-  //       icon: BitmapDescriptor.defaultMarker,
-  //     ));
-  //   });
-  // }
-
-  // void _onCameraMove(CameraPosition position) {
-  //   _currentMapPosition = position.target;
-  // }
-
-  // void _onCamereMoveToMyLocation(GoogleMapController controller) {
-  //   mapController = controller;
-
-  //   _location.onLocationChanged.listen((event) {
-  //     mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-  //         target: LatLng(event.latitude!, event.longitude!), zoom: 15)));
-  //   });
-  // }
-
   AnimationController? _controller;
-  BorderRadiusTween? borderRadius;
-  Duration _duration = Duration(milliseconds: 500);
+  AnimationController? _addCrimeController;
+
+  Duration _duration = Duration(seconds: 2);
   Tween<Offset> _tween = Tween(begin: Offset(0, 1), end: Offset(0, 0));
-  double? _height, min = 0.1, initial = 0.3, max = 0.7;
+  double? min = 0.0, initial = 0.13, max = 0.13;
+  File? file;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: _duration);
-    borderRadius = BorderRadiusTween(
-      begin: BorderRadius.circular(75.0),
-      end: BorderRadius.circular(0.0),
-    );
+    _addCrimeController = AnimationController(vsync: this, duration: _duration);
+    _addCrimeController!.reverse();
+    _controller!.forward();
   }
 
   @override
@@ -82,20 +55,20 @@ class _ReportedCrimeState extends State<ReportedCrime>
         ),
       ),
       drawer: DrawerWidget(),
-      floatingActionButton: GestureDetector(
-        child: FloatingActionButton(
-          child: AnimatedIcon(
-              icon: AnimatedIcons.menu_close, progress: _controller!),
-          elevation: 5,
-          backgroundColor: Colors.deepOrange,
-          foregroundColor: Colors.white,
-          onPressed: () async {
-            if (_controller!.isDismissed)
-              _controller!.forward();
-            else if (_controller!.isCompleted) _controller!.reverse();
-          },
-        ),
-      ),
+      // floatingActionButton: GestureDetector(
+      //   child: FloatingActionButton(
+      //     child: AnimatedIcon(
+      //         icon: AnimatedIcons.menu_close, progress: _controller!),
+      //     elevation: 5,
+      //     backgroundColor: Colors.deepOrange,
+      //     foregroundColor: Colors.white,
+      //     onPressed: () async {
+      //       if (_controller!.isDismissed)
+      //         _controller!.forward();
+      //       else if (_controller!.isCompleted) _controller!.reverse();
+      //     },
+      //   ),
+      // ),
       body: SizedBox.expand(
         child: Stack(
           children: <Widget>[
@@ -114,20 +87,67 @@ class _ReportedCrimeState extends State<ReportedCrime>
                     return AnimatedBuilder(
                       animation: controller,
                       builder: (context, child) {
-                        return ClipRRect(
-                          borderRadius: borderRadius!.evaluate(CurvedAnimation(
-                              parent: _controller!, curve: Curves.bounceIn)),
-                          child: Card(
-                            color: Colors.white,
-                            elevation: 12.0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            margin: const EdgeInsets.all(0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              child: CustomInnerContent(),
+                        return Card(
+                          color: Colors.white,
+                          elevation: 12.0,
+                          margin: const EdgeInsets.all(0),
+                          child: Container(
+                            decoration: BoxDecoration(),
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(height: 12),
+                                Container(
+                                  height: 5,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                InkWell(
+                                  onTap: () async {
+                                    _controller!.reverse();
+                                    takeImage(context);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(10.0),
+                                    margin: EdgeInsets.only(
+                                        left: 15.0, right: 15.0),
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.01),
+                                        Container(
+                                          height: 30,
+                                          width: 30,
+                                          child: Icon(Icons.add_outlined,
+                                              size: 30, color: Colors.black54),
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text("Add a place of crime",
+                                            style: TextStyle(
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                // SizedBox(height: 10),
+                              ],
                             ),
                           ),
                         );
@@ -142,28 +162,6 @@ class _ReportedCrimeState extends State<ReportedCrime>
       ),
     );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     // return Scaffold(
     //     extendBodyBehindAppBar: true,
     //     backgroundColor: Colors.white,
@@ -208,6 +206,81 @@ class _ReportedCrimeState extends State<ReportedCrime>
     //     // )
     //     // onPressed: () => _onAddMarkerButtonPressed),
     //     );
+  }
+
+  takeImage(mContext) {
+    return showDialog(
+        context: mContext,
+        builder: (con) {
+          return SimpleDialog(
+            title: Text(
+              "Crime Image",
+              style: TextStyle(
+                  color: Config().darkGradientShadecolor,
+                  fontWeight: FontWeight.bold),
+            ),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  pickPhotofromGallary();
+                },
+                child: Row(
+                  children: [
+                    Icon(Icons.photo_album, color: Colors.black26),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      "Select from Gallery",
+                      style: TextStyle(),
+                    ),
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _controller!.forward();
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.cancel,
+                      color: Colors.red,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      " Cancel",
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          );
+        });
+  }
+
+  pickPhotofromGallary() async {
+    Navigator.pop(context);
+
+    final picker = ImagePicker();
+
+    final imageFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (imageFile != null) {
+        file = File(imageFile.path);
+        _controller!.forward();
+      } else {
+        print('No image selected.');
+        _controller!.forward();
+      }
+    });
   }
 }
 

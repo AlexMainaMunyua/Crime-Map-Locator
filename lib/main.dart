@@ -22,8 +22,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          // primaryColor: Colors.white,
-          // accentColor: Colors.white,
+          brightness: Brightness.light,
+          primaryColor: Colors.white,
+          accentColor: Colors.white,
           // cardColor: Colors.white,
           fontFamily: 'NotoSansJP'),
         // home: AuthenticationPage(),

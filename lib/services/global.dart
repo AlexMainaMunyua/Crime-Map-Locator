@@ -7,13 +7,16 @@ class Global {
 
   //Data Models
   static final Map models = {
-    UserInfo: (data) => UserInfo.fromMap(data),
+    UserInformation: (data) => UserInformation.fromMap(data),
     CrimeLocation: (data) => CrimeLocation.fromMap(data),
   };
 
   // Firestore reference for writes.
-  static final UserData<UserInfo> userInfo =
-      UserData<UserInfo>(collection: 'user');
+  static final UserData<UserInformation> userInfo =
+      UserData<UserInformation>(collection: 'user');
+
+  static final Collection<UserInformation> userInformation = 
+  Collection<UserInformation>(path: 'user');
 
   static final Collection<CrimeLocation> crimeLocation =
       Collection<CrimeLocation>(path: 'crimeLocation');

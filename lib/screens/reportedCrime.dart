@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:crime_map/shared_widgets/shared_widgets.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:flutter/material.dart';
 
@@ -24,8 +23,8 @@ class _ReportedCrimeState extends State<ReportedCrime>
     super.initState();
     _controller = AnimationController(vsync: this, duration: _duration);
     _addCrimeController = AnimationController(vsync: this, duration: _duration);
-    _addCrimeController!.forward();
-    _controller!.reverse();
+    _addCrimeController!.reverse();
+    _controller!.forward();
   }
 
   @override
@@ -50,6 +49,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
               borderRadius: BorderRadius.circular(20),
               color: Config().lightGradientShadecolor),
         ),
+   
       ),
       drawer: DrawerWidget(),
       body: SizedBox.expand(
@@ -64,7 +64,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     );
   }
 
-  getAddCrimeDraggableWidget() {
+  Widget getAddCrimeDraggableWidget() {
     double min = 0.0, initial = 0.13, max = 0.13;
     Tween<Offset> _tween = Tween(begin: Offset(0, 1), end: Offset(0, 0));
 
@@ -223,8 +223,8 @@ class _ReportedCrimeState extends State<ReportedCrime>
     });
   }
 
-  getAddCrimeLocationWidget() {
-    double min = 0, initial = 0.9, max = 0.9;
+ Widget getAddCrimeLocationWidget() {
+    double min = 0, initial = 0.88, max = 0.88;
     Tween<Offset> _tween = Tween(begin: Offset(0, 1), end: Offset(0, 0));
 
     return SizedBox.expand(
@@ -310,7 +310,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
                             _controller!.forward();
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(
-                              "Congratulation! Your crime location successfully added",
+                              "Congratulation! Your crime location is successfully added",
                               textAlign: TextAlign.center,
                             )));
                           },
@@ -342,63 +342,5 @@ class _ReportedCrimeState extends State<ReportedCrime>
   }
 }
 
-class DrawerWidget extends StatelessWidget {
-  const DrawerWidget({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      child: Drawer(),
-    );
-  }
-}
 
-class MyGoogleMap extends StatefulWidget {
-  const MyGoogleMap({Key? key}) : super(key: key);
-
-  @override
-  _MyGoogleMapState createState() => _MyGoogleMapState();
-}
-
-class _MyGoogleMapState extends State<MyGoogleMap> {
-  late GoogleMapController mapController;
-
-  final LatLng _center = const LatLng(-1.1, 35.135);
-  final Set<Marker> _markers = Set();
-
-  @override
-  Widget build(BuildContext context) {
-    return GoogleMap(
-      onMapCreated: (controller) {
-        setState(() {
-          mapController = controller;
-        });
-      },
-      markers: this.myMarker(),
-      zoomControlsEnabled: false,
-      initialCameraPosition: CameraPosition(
-        target: _center,
-        zoom: 10.0,
-      ),
-    );
-  }
-
-  Set<Marker> myMarker() {
-    setState(() {
-      _markers.add(Marker(
-        // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId(_center.toString()),
-        draggable: true,
-        position: _center,
-        infoWindow: InfoWindow(
-          title: 'Historical City',
-          snippet: '5 Star Rating',
-        ),
-        icon: BitmapDescriptor.defaultMarker,
-      ));
-    });
-
-    return _markers;
-  }
-}

@@ -1,12 +1,21 @@
-class UserInfo {
+class UserInformation {
   String? userName;
   String? userEmail;
 
-  UserInfo({this.userEmail, this.userName});
+  UserInformation({this.userEmail, this.userName});
 
-  UserInfo.fromMap(Map data) {
-    userName = data['userName'];
-    userEmail = data['UserEmail'];
+  factory UserInformation.fromMap(Map data) {
+    return UserInformation(
+      userName: data['userName'] ?? "",
+      userEmail: data['userEmail'] ?? "",
+    );
+  }
+
+  factory UserInformation.initialData() {
+     return UserInformation(
+      userName: "user name",
+      userEmail: "email@gmail.com",
+    );
   }
 }
 
@@ -20,9 +29,9 @@ class CrimeLocation {
 
   factory CrimeLocation.fromMap(Map data) {
     return CrimeLocation(
-      latitude: data['latitude']?? '',
-      longitude: data['longitude']?? '',
-      reportNumber: data['reportNumber']?? '',
+      latitude: data['latitude'] ?? '',
+      longitude: data['longitude'] ?? '',
+      reportNumber: data['reportNumber'] ?? '',
       img: data['img'] ?? 'default.png',
     );
   }

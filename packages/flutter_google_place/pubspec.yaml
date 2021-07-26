@@ -1,0 +1,28 @@
+name: flutter_google_place
+description: A new Flutter package project.
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_api_headers: ^1.1.0
+  google_maps_webservice: ^0.0.20-nullsafety.5
+  http: ^0.13.3
+  rxdart: ^0.27.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  assets:
+    - packages/flutter_google_place/assets/google_black.png
+    - packages/flutter_google_place/assets/google_white.png
+
+

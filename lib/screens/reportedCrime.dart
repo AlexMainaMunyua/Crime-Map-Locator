@@ -1,14 +1,18 @@
 import 'dart:io';
+import 'package:crime_map/services/model.dart';
+import 'package:crime_map/shared_widgets/crimeApp.dart';
 import 'package:flutter_geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crime_map/shared_widgets/shared_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+
+import 'package:provider/provider.dart';
 
 class ReportedCrime extends StatefulWidget {
   const ReportedCrime({Key? key}) : super(key: key);
@@ -22,6 +26,7 @@ final searchScaffoldKey = GlobalKey<ScaffoldState>();
 
 class _ReportedCrimeState extends State<ReportedCrime>
     with TickerProviderStateMixin {
+  final crimeRef = FirebaseFirestore.instance.collection('crime');
   AnimationController? _controller;
   AnimationController? _addCrimeController;
   Duration? _duration = Duration(seconds: 2);
@@ -29,15 +34,21 @@ class _ReportedCrimeState extends State<ReportedCrime>
   Location location = Location();
   LocationData? _currentPosition;
   String? _address;
+  int reportNumber = 1;
   LatLng _initialcameraposition = LatLng(-1.1, 35.135);
   late GoogleMapController mapController;
-  final Set<Marker> _markers = Set();
+  // final Set<Marker> _markers = Set();
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  String? downloadUrlLink;
+
+  List<Marker> allMarker = [];
 
   String crimeId = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   void initState() {
     super.initState();
+    myMarker();
     _controller = AnimationController(vsync: this, duration: _duration!);
     _addCrimeController =
         AnimationController(vsync: this, duration: _duration!);
@@ -45,15 +56,6 @@ class _ReportedCrimeState extends State<ReportedCrime>
     _controller!.forward();
     getLocation();
   }
-
-  // A method to initial the current position of the user.
-  // void _onMapcreated(GoogleMapController _controller) {
-  //   _controller = mapController;
-  //   location.onLocationChanged.listen((event) {
-  //     _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-  //         target: LatLng(event.latitude!, event.longitude!), zoom: 15)));
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +106,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
           mapController = controller;
         });
       },
-      myLocationEnabled: true,
-      // onMapCreated: _onMapcreated,
-      markers: this.myMarker(),
+      markers: Set<Marker>.of(markers.values),
       zoomControlsEnabled: false,
       initialCameraPosition: CameraPosition(
         target: _initialcameraposition,
@@ -115,22 +115,41 @@ class _ReportedCrimeState extends State<ReportedCrime>
     );
   }
 
-  // My map markets
-  Set<Marker> myMarker() {
-    setState(() {
-      _markers.add(Marker(
-        // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId(_initialcameraposition.toString()),
-        draggable: true,
-        position: _initialcameraposition,
-        infoWindow: InfoWindow(
-          title: 'Historical City',
-          snippet: '5 Star Rating',
-        ),
-        icon: BitmapDescriptor.defaultMarker,
-      ));
+  myMarker() {
+    FirebaseFirestore.instance.collection('crime').get().then((docs) {
+      if (docs.docs.isNotEmpty) {
+        for (int i = 0; i < docs.docs.length; i++) {
+          initMarker(docs.docs[i].data(), docs.docs[i].id);
+        }
+      }
     });
-    return _markers;
+  }
+
+  void initMarker(mData, mId) {
+    var markerIdVal = mId;
+    print(markerIdVal);
+    final MarkerId markerId = MarkerId(markerIdVal);
+
+    final Marker marker = Marker(
+        markerId: markerId,
+        draggable: false,
+        icon: selectIcon(mData['reportNumber']),
+        position: LatLng(mData['latitude'], mData['longitude']));
+
+    setState(() {
+      markers[markerId] = marker;
+    });
+  }
+
+  selectIcon(int reportNumber) {
+    var number = reportNumber;
+    if (number <= 5) {
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+    } else if (number > 5 && number <= 20) {
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+    } else {
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+    }
   }
 
   // Add crime dragrabble widget.
@@ -414,7 +433,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
                         SizedBox(height: 20),
                         if (_currentPosition != null)
                           Text(
-                              "Latitude: ${_currentPosition!.latitude}, Longitude: ${_currentPosition!.longitude}"),
+                              "Latitude: ${_currentPosition!.latitude!}, Longitude: ${_currentPosition!.longitude!}"),
                         SizedBox(
                           height: 3,
                         ),
@@ -424,7 +443,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
                           onTap: () async {
                             _addCrimeController!.reverse();
                             _controller!.forward();
-                            uploadImageAndSaveCrimeLocationInfo();
+                            await uploadImageAndSaveCrimeLocationInfo();
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(
                               "Congratulation! Your crime location is successfully added",
@@ -462,7 +481,11 @@ class _ReportedCrimeState extends State<ReportedCrime>
   uploadImageAndSaveCrimeLocationInfo() async {
     String imageDownloadUrl = await uploadCrimeImage(file);
 
-    saveCrimeLocation(imageDownloadUrl);
+    setState(() {
+      downloadUrlLink = imageDownloadUrl;
+    });
+
+    filterCrimeData();
   }
 
   // upload crime image
@@ -478,21 +501,81 @@ class _ReportedCrimeState extends State<ReportedCrime>
     return downloadUrl;
   }
 
-  //Save Crime location
-  saveCrimeLocation(String downloadUrl) {
-    final crimeRef = FirebaseFirestore.instance.collection('crime');
+  // Filter collection data
+  filterCrimeData() async {
+    FirebaseFirestore.instance.collection('crime').get().then((doc) {
+      if (doc.docs.isNotEmpty) {
+        for (int i = 0; i < doc.docs.length; i++) {
+          saveCrimeData(doc.docs[i].data(), doc.docs[i].id);
+        }
+      } else {
+        saveCrimeLocation();
+      }
+    });
+  }
 
-    int reportNumber = 1;
+  saveCrimeData(cData, cId) async {
+    final QuerySnapshot result = await crimeRef.get();
 
+    final List<DocumentSnapshot> documents = result.docs;
+
+    if ((documents.singleWhereOrNull((element) =>
+            element.get('latitude') == _currentPosition!.latitude &&
+            element.get('longitude') == _currentPosition!.longitude)) !=
+        null) {
+      // add image to list.
+      addImageToList(cId);
+      
+    } else {
+      // set Data
+      saveCrimeLocation();
+    }
+  }
+
+  saveCrimeLocation() {
+    
     crimeRef.doc(crimeId).set({
       "latitude": _currentPosition!.latitude,
       "longitude": _currentPosition!.longitude,
-      "reportNumber": reportNumber,
-      "crimeImage": downloadUrl,
+      CrimeApp.reportNumber: CrimeApp.imageList.length,
+      CrimeApp.imageList: ["garbageData"],
     });
     setState(() {
-      file = null;
-      crimeId = DateTime.now().millisecondsSinceEpoch.toString();
+      CrimeApp.sharedPreferences.setInt(CrimeApp.reportNumber, CrimeApp.imageList.length);
+      CrimeApp.sharedPreferences
+          .setStringList(CrimeApp.imageList, ["garbageData"]);
     });
+
+    // add image to list
+    addImageToList(crimeId);
+  }
+
+  // Add an image
+  addImageToList(String? id) {
+    List imageList =
+        CrimeApp.sharedPreferences.getStringList(CrimeApp.imageList)!;
+
+    imageList.add(downloadUrlLink);
+
+    crimeRef.doc(id).update({CrimeApp.imageList: imageList});
+
+    CrimeApp.sharedPreferences
+        .setStringList(CrimeApp.imageList, imageList as List<String>);
   }
 }
+
+//Save Crime location
+// saveCrimeLocation(String downloadUrl) {
+//   final crimeRef = FirebaseFirestore.instance.collection('crime');
+
+//   crimeRef.doc(crimeId).set({
+//     "latitude": _currentPosition!.latitude,
+//     "longitude": _currentPosition!.longitude,
+//     "reportNumber": reportNumber,
+//     "crimeImage": downloadUrl,
+//   });
+//   setState(() {
+//     file = null;
+//     crimeId = DateTime.now().millisecondsSinceEpoch.toString();
+//   });
+// }

@@ -37,6 +37,7 @@ dependencies:
       url: https://github.com/JCKodel/flutter_geocoder.git
       ref: "7059f6f"
   firebase_storage: ^10.0.1
+  shared_preferences: ^2.0.6
 
 
 

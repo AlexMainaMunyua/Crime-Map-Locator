@@ -204,11 +204,41 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  firebase_storage:
+    dependency: "direct main"
+    description:
+      name: firebase_storage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "10.0.1"
+  firebase_storage_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_storage_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.0"
+  firebase_storage_web:
+    dependency: transitive
+    description:
+      name: firebase_storage_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_geocoder:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "7059f6f"
+      resolved-ref: "7059f6f629336be2fa71117e971b5e7d9fd091f9"
+      url: "https://github.com/JCKodel/flutter_geocoder.git"
+    source: git
+    version: "0.2.2-nullsafety"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

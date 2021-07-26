@@ -1,7 +1,5 @@
 import 'package:crime_map/screens/screens.dart';
-import 'package:crime_map/services/auth.dart';
 import 'package:crime_map/services/service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';

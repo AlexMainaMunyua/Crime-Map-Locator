@@ -19,12 +19,26 @@ dependencies:
   rxdart: ^0.27.1
   flutter_riverpod: ^0.14.0+3
   font_awesome_flutter: ^9.1.0
-  provider: ^6.0.0-dev
+  provider: ^6.0.0-dev  
   google_maps_flutter: ^2.0.6
   http: ^0.13.3
   json_serializable: ^4.1.0
   location: ^4.3.0
   image_picker: ^0.8.2
+  # geocoding: ^2.0.0
+  # flutter_geocoder:
+  #   path: packages/flutter_geocoder
+  # geocoder:
+  #   git:
+  #     url: https://github.com/Eimji/flutter_geocoder.git
+  #     ref: bc34cfe473bfd1934fe098bb7053248b75200241
+  flutter_geocoder:
+    git:
+      url: https://github.com/JCKodel/flutter_geocoder.git
+      ref: "7059f6f"
+  firebase_storage: ^10.0.1
+
+
 
 dev_dependencies:
   flutter_test:

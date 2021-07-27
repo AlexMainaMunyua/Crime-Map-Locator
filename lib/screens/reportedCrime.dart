@@ -9,7 +9,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'dart:async';
-
+import 'package:carousel_slider/carousel_slider.dart';
 
 class ReportedCrime extends StatefulWidget {
   const ReportedCrime({Key? key}) : super(key: key);
@@ -23,6 +23,7 @@ final searchScaffoldKey = GlobalKey<ScaffoldState>();
 
 class _ReportedCrimeState extends State<ReportedCrime>
     with TickerProviderStateMixin {
+  
   final crimeRef = FirebaseFirestore.instance.collection('crime');
   AnimationController? _controller;
   AnimationController? _addCrimeController;
@@ -34,9 +35,10 @@ class _ReportedCrimeState extends State<ReportedCrime>
   int reportNumber = 1;
   LatLng _initialcameraposition = LatLng(-1.1, 35.135);
   late GoogleMapController mapController;
-  // final Set<Marker> _markers = Set();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   String? downloadUrlLink;
+  int _current = 0;
+  final CarouselController _carouselController = CarouselController();
 
   List<Marker> allMarker = [];
 
@@ -124,13 +126,14 @@ class _ReportedCrimeState extends State<ReportedCrime>
 
   void initMarker(mData, mId) {
     var markerIdVal = mId;
+    var markerData = mData;
     print(markerIdVal);
     final MarkerId markerId = MarkerId(markerIdVal);
 
     final Marker marker = Marker(
         markerId: markerId,
         draggable: false,
-        onTap: () {},
+        onTap: () => fetchMarkerImages(markerData),
         icon: selectIcon(mData['reportNumber']),
         position: LatLng(mData['latitude'], mData['longitude']));
 
@@ -139,6 +142,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     });
   }
 
+  // Icon Color
   selectIcon(int reportNumber) {
     var number = reportNumber;
     if (number <= 5) {
@@ -148,6 +152,41 @@ class _ReportedCrimeState extends State<ReportedCrime>
     } else {
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
     }
+  }
+
+  //Fetch Marker Color
+  fetchMarkerImages(mData) {
+    List list = mData['crimeImage'];
+
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Container(
+              child: CarouselSlider(
+            items: list
+                .map((image) => Container(
+                      margin: EdgeInsets.only(bottom: 6.0),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          image: DecorationImage(
+                              image: NetworkImage(image), fit: BoxFit.fill)),
+                    ))
+                .toList(),
+            carouselController: _carouselController,
+            options: CarouselOptions(
+                aspectRatio: 16 / 9,
+                height: 200,
+                autoPlayAnimationDuration: Duration(milliseconds: 800),
+                viewportFraction: 0.95,
+                enlargeCenterPage: true,
+                autoPlay: true,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _current = index;
+                  });
+                }),
+          ));
+        });
   }
 
   // Add crime dragrabble widget.
@@ -512,7 +551,8 @@ class _ReportedCrimeState extends State<ReportedCrime>
       // add image to list.
       addImageToList(_currentPosition!.verticalAccuracy!.truncate().toString());
       //increae the number of reports.
-      increamentReportNumber(_currentPosition!.verticalAccuracy!.truncate().toString());
+      increamentReportNumber(
+          _currentPosition!.verticalAccuracy!.truncate().toString());
     } else {
       // set Data
       saveCrimeLocation();
@@ -521,7 +561,9 @@ class _ReportedCrimeState extends State<ReportedCrime>
 
   // Set data to firestore.
   saveCrimeLocation() {
-    crimeRef.doc(_currentPosition!.verticalAccuracy!.truncate().toString()).set({
+    crimeRef
+        .doc(_currentPosition!.verticalAccuracy!.truncate().toString())
+        .set({
       "latitude": _currentPosition!.latitude,
       "longitude": _currentPosition!.longitude,
       "reportNumber": reportNumber,

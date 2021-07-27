@@ -12,7 +12,7 @@ class UserInformation {
   }
 
   factory UserInformation.initialData() {
-     return UserInformation(
+    return UserInformation(
       userName: "user name",
       userEmail: "email@gmail.com",
     );
@@ -23,7 +23,7 @@ class CrimeLocation {
   final String? latitude;
   final String? longitude;
   final int? reportNumber;
-  final String? img;
+  final List? img;
 
   CrimeLocation({this.latitude, this.longitude, this.reportNumber, this.img});
 

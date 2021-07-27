@@ -24,6 +24,8 @@ class Collection<T> {
     return ref!.snapshots().map((list) =>
         list.docs.map((doc) => Global.models[T](doc.data()) as T).toList());
   }
+
+  
 }
 
 class UserData<T> {

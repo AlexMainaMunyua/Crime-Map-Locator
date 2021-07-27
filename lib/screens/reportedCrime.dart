@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:crime_map/services/model.dart';
-import 'package:crime_map/shared_widgets/crimeApp.dart';
 import 'package:flutter_geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 
-import 'package:provider/provider.dart';
 
 class ReportedCrime extends StatefulWidget {
   const ReportedCrime({Key? key}) : super(key: key);

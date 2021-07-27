@@ -23,6 +23,7 @@ final searchScaffoldKey = GlobalKey<ScaffoldState>();
 
 class _ReportedCrimeState extends State<ReportedCrime>
     with TickerProviderStateMixin {
+  
   final crimeRef = FirebaseFirestore.instance.collection('crime');
   AnimationController? _controller;
   AnimationController? _addCrimeController;
@@ -34,7 +35,6 @@ class _ReportedCrimeState extends State<ReportedCrime>
   int reportNumber = 1;
   LatLng _initialcameraposition = LatLng(-1.1, 35.135);
   late GoogleMapController mapController;
-  // final Set<Marker> _markers = Set();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   String? downloadUrlLink;
   int _current = 0;

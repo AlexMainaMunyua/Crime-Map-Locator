@@ -15,9 +15,6 @@ class Global {
   static final UserData<UserInformation> userInfo =
       UserData<UserInformation>(collection: 'user');
 
-  static final Collection<UserInformation> userInformation = 
-  Collection<UserInformation>(path: 'user');
-
   static final Collection<CrimeLocation> crimeLocation =
-      Collection<CrimeLocation>(path: 'crimeLocation');
+      Collection<CrimeLocation>(path: 'crime');
 }

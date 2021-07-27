@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:crime_map/services/model.dart';
-import 'package:crime_map/shared_widgets/crimeApp.dart';
 import 'package:flutter_geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 
-import 'package:provider/provider.dart';
 
 class ReportedCrime extends StatefulWidget {
   const ReportedCrime({Key? key}) : super(key: key);
@@ -133,6 +130,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     final Marker marker = Marker(
         markerId: markerId,
         draggable: false,
+        onTap: () {},
         icon: selectIcon(mData['reportNumber']),
         position: LatLng(mData['latitude'], mData['longitude']));
 
@@ -485,7 +483,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
       downloadUrlLink = imageDownloadUrl;
     });
 
-    filterCrimeData();
+    saveCrimeData();
   }
 
   // upload crime image
@@ -501,81 +499,82 @@ class _ReportedCrimeState extends State<ReportedCrime>
     return downloadUrl;
   }
 
-  // Filter collection data
-  filterCrimeData() async {
-    FirebaseFirestore.instance.collection('crime').get().then((doc) {
-      if (doc.docs.isNotEmpty) {
-        for (int i = 0; i < doc.docs.length; i++) {
-          saveCrimeData(doc.docs[i].data(), doc.docs[i].id);
-        }
-      } else {
-        saveCrimeLocation();
-      }
-    });
-  }
-
-  saveCrimeData(cData, cId) async {
+  // Filter whether the crimelocaton exist or not.
+  saveCrimeData() async {
     final QuerySnapshot result = await crimeRef.get();
 
     final List<DocumentSnapshot> documents = result.docs;
 
     if ((documents.singleWhereOrNull((element) =>
-            element.get('latitude') == _currentPosition!.latitude &&
-            element.get('longitude') == _currentPosition!.longitude)) !=
+            element.id.toString() ==
+            _currentPosition!.verticalAccuracy!.truncate().toString())) !=
         null) {
       // add image to list.
-      addImageToList(cId);
-      
+      addImageToList(_currentPosition!.verticalAccuracy!.truncate().toString());
+      //increae the number of reports.
+      increamentReportNumber(_currentPosition!.verticalAccuracy!.truncate().toString());
     } else {
       // set Data
       saveCrimeLocation();
     }
   }
 
+  // Set data to firestore.
   saveCrimeLocation() {
-    
-    crimeRef.doc(crimeId).set({
+    crimeRef.doc(_currentPosition!.verticalAccuracy!.truncate().toString()).set({
       "latitude": _currentPosition!.latitude,
       "longitude": _currentPosition!.longitude,
-      CrimeApp.reportNumber: CrimeApp.imageList.length,
-      CrimeApp.imageList: ["garbageData"],
+      "reportNumber": reportNumber,
+      "crimeImage": [downloadUrlLink],
     });
     setState(() {
-      CrimeApp.sharedPreferences.setInt(CrimeApp.reportNumber, CrimeApp.imageList.length);
-      CrimeApp.sharedPreferences
-          .setStringList(CrimeApp.imageList, ["garbageData"]);
+      file = null;
+      crimeId = DateTime.now().millisecondsSinceEpoch.toString();
     });
 
-    // add image to list
-    addImageToList(crimeId);
+    // add image to list.
+    // addImageToList(crimeId);
   }
 
-  // Add an image
-  addImageToList(String? id) {
-    List imageList =
-        CrimeApp.sharedPreferences.getStringList(CrimeApp.imageList)!;
+  // Add an image.
+  addImageToList(id) {
+    var crimeIdVal = id;
+    DocumentReference documentReference = crimeRef.doc(crimeIdVal);
 
-    imageList.add(downloadUrlLink);
+    return FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(documentReference);
 
-    crimeRef.doc(id).update({CrimeApp.imageList: imageList});
+      if (!snapshot.exists) {
+        throw Exception("Document does not exist!");
+      }
 
-    CrimeApp.sharedPreferences
-        .setStringList(CrimeApp.imageList, imageList as List<String>);
+      List newImage = snapshot.get('crimeImage');
+
+      newImage.add(downloadUrlLink);
+
+      transaction.update(documentReference, {'crimeImage': newImage});
+
+      return newImage;
+    });
+  }
+
+  //increment crime report number.
+  increamentReportNumber(id) async {
+    var crimeIdVal = id;
+    DocumentReference documentReference = crimeRef.doc(crimeIdVal);
+
+    return FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(documentReference);
+
+      if (!snapshot.exists) {
+        throw Exception("Document does not exist!");
+      }
+
+      int newReport = snapshot.get('reportNumber') + 1;
+
+      transaction.update(documentReference, {'reportNumber': newReport});
+
+      return newReport;
+    });
   }
 }
-
-//Save Crime location
-// saveCrimeLocation(String downloadUrl) {
-//   final crimeRef = FirebaseFirestore.instance.collection('crime');
-
-//   crimeRef.doc(crimeId).set({
-//     "latitude": _currentPosition!.latitude,
-//     "longitude": _currentPosition!.longitude,
-//     "reportNumber": reportNumber,
-//     "crimeImage": downloadUrl,
-//   });
-//   setState(() {
-//     file = null;
-//     crimeId = DateTime.now().millisecondsSinceEpoch.toString();
-//   });
-// }

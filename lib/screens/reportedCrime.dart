@@ -76,7 +76,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     );
   }
 
-  // My app bar widget.
+  // My appBar widget
   myAppBar() {
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -97,7 +97,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     );
   }
 
-  // My map.
+  // My map
   Widget myMap() {
     return GoogleMap(
       onMapCreated: (controller) {
@@ -114,6 +114,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     );
   }
 
+ //identify each marker id and data 
   myMarker() {
     FirebaseFirestore.instance.collection('crime').get().then((docs) {
       if (docs.docs.isNotEmpty) {
@@ -124,6 +125,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     });
   }
 
+  // initialize each marker
   void initMarker(mData, mId) {
     var markerIdVal = mId;
     var markerData = mData;
@@ -142,7 +144,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     });
   }
 
-  // Icon Color
+  // Marker Icon Color
   selectIcon(int reportNumber) {
     var number = reportNumber;
     if (number <= 5) {
@@ -154,7 +156,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     }
   }
 
-  //Fetch Marker Color
+  //Fetch Marker Images
   fetchMarkerImages(mData) {
     List list = mData['crimeImage'];
 
@@ -189,7 +191,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
         });
   }
 
-  // Add crime dragrabble widget.
+  // get addCrimeDragrabble widget.
   Widget getAddCrimeDraggableWidget() {
     double min = 0.0, initial = 0.13, max = 0.13;
     Tween<Offset> _tween = Tween(begin: Offset(0, 1), end: Offset(0, 0));
@@ -273,7 +275,7 @@ class _ReportedCrimeState extends State<ReportedCrime>
     );
   }
 
-  // take Image dialog box
+  // take image dialog box
   takeImage(mContext) {
     return showDialog(
         barrierDismissible: false,
@@ -357,9 +359,9 @@ class _ReportedCrimeState extends State<ReportedCrime>
     bool _serviceEnabled;
     PermissionStatus _permissonStatus;
 
+    // check if permission to access location is allowed.
     _serviceEnabled = await location.serviceEnabled();
 
-    // check if permission to access location is allowed.
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
@@ -376,9 +378,9 @@ class _ReportedCrimeState extends State<ReportedCrime>
       }
     }
 
+    // Initialize the currect location of the user.
     _currentPosition = await location.getLocation();
 
-    // Initialize the currect lococation of the user.
     _initialcameraposition =
         LatLng(_currentPosition!.latitude!, _currentPosition!.longitude!);
     location.onLocationChanged.listen((LocationData currentLocation) {
